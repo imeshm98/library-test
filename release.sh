@@ -54,3 +54,4 @@ git add .
 git commit -m "Released new version"
 git push origin main
 git tag $NEW_VERSION
+git push origin $NEW_VERSION
