@@ -12,7 +12,7 @@
 
 	<groupId>com.example</groupId>
 	<artifactId>my-app</artifactId>
-	<version>.. + 1-SNAPSHOT</version>
+	<version>..-SNAPSHOT</version>
 	<name>my-app</name>
 
 	<properties>
