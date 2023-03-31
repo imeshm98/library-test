@@ -8,7 +8,8 @@ SNAPSHOT_FOLDER="snapshots"
 RELEASE_TYPE=$1
 
 # Get the current version from the POM file
-CURRENT_VERSION=$(sed -n 's/.*<artifactId>'"$LIB_NAME"'<\/artifactId>.*<version>\(.*\)-SNAPSHOT<\/version>.*/\1/p' pom.xml)
+# CURRENT_VERSION=$(sed -n 's/.*<artifactId>'"$LIB_NAME"'<\/artifactId>.*<version>\(.*\)-SNAPSHOT<\/version>.*/\1/p' pom.xml)
+CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 
 # Get version to an array
 IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
@@ -18,11 +19,11 @@ PATCH_VERSION=${VERSION_PARTS[2]}
 
 # Check the release type and increase the version
 if [ "$RELEASE_TYPE" == "patch" ]; then
-    NEW_VERSION="$MAJOR_VERSION.$MINOR_VERSION.$(PATCH_VERSION + 1)"
+    NEW_VERSION="$MAJOR_VERSION.$MINOR_VERSION.$((PATCH_VERSION + 1))"
 elif [ "$RELEASE_TYPE" == "minor" ]; then
-    NEW_VERSION="$MAJOR_VERSION.$(MINOR_VERSION + 1).0"
+    NEW_VERSION="$MAJOR_VERSION.$((MINOR_VERSION + 1)).0"
 elif [ "$RELEASE_TYPE" == "major" ]; then
-    NEW_VERSION="$(MAJOR_VERSION + 1).0.0"
+    NEW_VERSION="$((MAJOR_VERSION + 1)).0.0"
 else 
     echo "Invalid input..."
     exit 1
