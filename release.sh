@@ -53,4 +53,4 @@ mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${SN
 git add .
 git commit -m "Released new version"
 git push origin main
-git tag
+git tag $NEW_VERSION
