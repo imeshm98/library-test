@@ -8,7 +8,6 @@ SNAPSHOT_FOLDER="snapshots"
 RELEASE_TYPE=$1
 
 # Get the current version from the POM file
-# CURRENT_VERSION=$(sed -n 's/.*<artifactId>'"$LIB_NAME"'<\/artifactId>.*<version>\(.*\)-SNAPSHOT<\/version>.*/\1/p' pom.xml)
 CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 
 # Get version to an array
