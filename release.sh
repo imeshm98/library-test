@@ -40,14 +40,14 @@ fi
 mvn versions:set -DnewVersion=$NEW_VERSION
 
 # Deploy the release JAR to S3
-mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${RELEASE_FOLDER}"
+mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${SNAPSHOT_FOLDER}"
 
 # Replace the version in the POM file with the new snapshot version
 # sed -i 's|^\(\s*\)<version>'"$NEW_VERSION'</version>$|\1<version>'"$NEW_VERSION-SNAPSHOT"'</version>|' pom.xml
 mvn versions:set -DnewVersion="$NEW_VERSION-SNAPSHOT"
 
 # Deploy the snapshot JAR to S3
-mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${SNAPSHOT_FOLDER}"
+mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${RELEASE_FOLDER}"
 
 # Commit and push changes to GitHub main branch only
 git add .
