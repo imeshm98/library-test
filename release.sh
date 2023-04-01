@@ -2,7 +2,7 @@
 
 # Set variables
 LIB_NAME="my-app"
-BUCKET_NAME="jar-artifacts"
+BUCKET_NAME="my-app-new"
 RELEASE_FOLDER="releases"
 SNAPSHOT_FOLDER="snapshots"
 RELEASE_TYPE=$1
@@ -47,7 +47,7 @@ mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${RE
 mvn versions:set -DnewVersion="$NEW_VERSION-SNAPSHOT"
 
 # Deploy the snapshot JAR to S3
-mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${RELEASE_FOLDER}"
+mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${SNAPSHOT_FOLDER}"
 
 # Commit and push changes to GitHub main branch only
 git add .
