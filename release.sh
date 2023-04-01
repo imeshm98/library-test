@@ -2,7 +2,7 @@
 
 # Set variables
 LIB_NAME="my-app"
-BUCKET_NAME="my-app-new"
+BUCKET_NAME="my-app-repo"
 RELEASE_FOLDER="releases"
 SNAPSHOT_FOLDER="snapshots"
 RELEASE_TYPE=$1
