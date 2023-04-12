@@ -24,7 +24,7 @@ elif [ "$RELEASE_TYPE" == "minor" ]; then
 elif [ "$RELEASE_TYPE" == "major" ]; then
     NEW_VERSION="$((MAJOR_VERSION + 1)).0.0"
 else 
-    echo "Invalid input..."
+    echo "Use patch, minor or major as parameters. (eg:- ./release.sh patch)"
     exit 1
 fi
 
