@@ -35,19 +35,28 @@ if [ "$BRANCH_NAME" != "main" ]; then
     exit 1
 fi
 
-# Replace the version in the POM file with the new release version
-# sed -i 's|^\(\s*\)<version>'"$CURRENT_VERSION"'-SNAPSHOT</version>$|\1<version>'"$NEW_VERSION"'</version>|' pom.xml
-mvn versions:set -DnewVersion=$NEW_VERSION
 
-# Deploy the release JAR to S3
-mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${RELEASE_FOLDER}"
-
-# Replace the version in the POM file with the new snapshot version
-# sed -i 's|^\(\s*\)<version>'"$NEW_VERSION'</version>$|\1<version>'"$NEW_VERSION-SNAPSHOT"'</version>|' pom.xml
-mvn versions:set -DnewVersion="$NEW_VERSION-SNAPSHOT"
+if ! mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${SNAPSHOT_FOLDER}"; then
+    echo "Failed to deploy snapshot JAR to S3"
+    exit 1
+fi
 
 # Deploy the snapshot JAR to S3
-mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${SNAPSHOT_FOLDER}"
+# mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${SNAPSHOT_FOLDER}"
+
+# Replace the version in the POM file with the new release version
+mvn versions:set -DnewVersion=$NEW_VERSION
+
+if ! mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${RELEASE_FOLDER}"; then
+    echo "Failed to deploy release JAR to S3"
+    exit 1
+fi
+
+# Deploy the release JAR to S3
+# mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${RELEASE_FOLDER}"
+
+# Replace the version in the POM file with the new snapshot version
+mvn versions:set -DnewVersion="$NEW_VERSION-SNAPSHOT"
 
 # Commit and push changes to GitHub main branch only
 git add .
