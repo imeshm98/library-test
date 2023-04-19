@@ -26,13 +26,6 @@ if ! mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}
     exit 1
 fi
 
-# Commit and push changes to GitHub main branch
-git add .
-git commit -m "Snapshot version upgrade"
-git push origin development
-git tag "$NEW_VERSION-SNAPSHOT"
-git push origin "$NEW_VERSION-SNAPSHOT"
-
 # Release from Main Branch
 git checkout main
 
