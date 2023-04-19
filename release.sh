@@ -7,6 +7,35 @@ RELEASE_FOLDER="releases"
 SNAPSHOT_FOLDER="snapshots"
 RELEASE_TYPE=$1
 
+BRANCH_NAME=$(git branch --show-current)
+if [ "$BRANCH_NAME" != "main" ]; then
+    echo "You can only run script from 'main' branch. Switch to the 'main' branch"
+    exit 1
+fi
+
+if [[ $(git branch --list development) ]]; then
+    git checkout development origin/development
+else
+    git checkout -b development origin/development
+fi
+
+# Snapshot from Development Branch
+# Get the current version from the POM file
+if ! mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${SNAPSHOT_FOLDER}"; then
+    echo "Failed to deploy snapshot JAR to S3"
+    exit 1
+fi
+
+# Commit and push changes to GitHub main branch
+git add .
+git commit -m "Snapshot version upgrade"
+git push origin development
+git tag "$NEW_VERSION-SNAPSHOT"
+git push origin "$NEW_VERSION-SNAPSHOT"
+
+# Release from Main Branch
+git checkout main
+
 # Get the current version from the POM file
 CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 
@@ -28,22 +57,6 @@ else
     exit 1
 fi
 
-# Check user working on main branch or not
-BRANCH_NAME=$(git branch --show-current)
-if [ "$BRANCH_NAME" != "main" ]; then
-    echo "You can only push changes from the 'main' branch. Switch to the 'main' branch"
-    exit 1
-fi
-
-
-if ! mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${SNAPSHOT_FOLDER}"; then
-    echo "Failed to deploy snapshot JAR to S3"
-    exit 1
-fi
-
-# Deploy the snapshot JAR to S3
-# mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${SNAPSHOT_FOLDER}"
-
 # Replace the version in the POM file with the new release version
 mvn versions:set -DnewVersion=$NEW_VERSION
 
@@ -52,13 +65,10 @@ if ! mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}
     exit 1
 fi
 
-# Deploy the release JAR to S3
-# mvn deploy -DaltDeploymentRepository="s3-repo::default::s3://${BUCKET_NAME}/${RELEASE_FOLDER}"
-
 # Replace the version in the POM file with the new snapshot version
 mvn versions:set -DnewVersion="$NEW_VERSION-SNAPSHOT"
 
-# Commit and push changes to GitHub main branch only
+# Commit and push changes to GitHub main branch
 git add .
 git commit -m "Released new version"
 git push origin main
